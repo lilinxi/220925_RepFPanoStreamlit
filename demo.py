@@ -1,9 +1,12 @@
 import time
+import subprocess
+import threading
 
 import streamlit as st
 import numpy as np
 
 from util import *
+from client import *
 
 Title = "RepF Pano Context"
 
@@ -24,58 +27,78 @@ uploaded_file = st.file_uploader("Drag and drop a pano image, only jpg or png ar
 if uploaded_file is not None:
     file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
     opencv_image = cv2.imdecode(file_bytes, 1)
-    cv2.imwrite('test.png', opencv_image)
+    image_path = "./test.png"
+    cv2.imwrite(image_path, opencv_image)
 
     with st.sidebar:
         st.header("Load Pano Image")
         with st.spinner("Loading Pano Image..."):
-            st_image_file(st, './test.png')
+            st_image_file(st, image_path)
         st.success("Load Pano Image Success!")
 
         st.header("Process Pano Image")
+
+        log_path = f"{image_path}.log"
+        if os.path.exists(log_path):
+            os.remove(log_path)
+        open(log_path, 'w').close()
+
+        p = subprocess.Popen(f'tail -f {log_path}', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        threading.Thread(target=detect_client(image_path)).start()
+
+        line = p.stdout.readline().decode("utf-8")[:-1]
         PROGRESS = get_progress()
         PROGRESS(10)
+
+        project_num = int(p.stdout.readline().decode("utf-8")[:-1])
 
     col1, col2, col3, col4 = st.columns([1, 1, 2, 2])
 
     with col1:
         st.subheader("Proj Image")
         total_progress = 20
-        image_list = [f'./network/proj_image_{i}.png' for i in range(19)]
-        sub_progress = total_progress / len(image_list)
-        for img in image_list:
-            PROGRESS(sub_progress)
+        sub_progress = total_progress / project_num
+
+        for i in range(project_num):
+            img = p.stdout.readline().decode("utf-8")[:-1]
             st_image_file(st, img, width=150)
+            PROGRESS(sub_progress)
+
     with col2:
         st.subheader("Proj Result")
         total_progress = 20
-        image_list = [f'./network/proj_image_{i}.png' for i in range(19)]
-        sub_progress = total_progress / len(image_list)
-        for img in image_list:
-            PROGRESS(sub_progress)
+        sub_progress = total_progress / project_num
+
+        for i in range(project_num):
+            img = p.stdout.readline().decode("utf-8")[:-1]
             st_image_file(st, img, width=150)
+            PROGRESS(sub_progress)
 
     with col3:
         st.subheader("Re-Proj Image")
         total_progress = 20
-        image_list = [f'./network/proj_resp_{i}.png' for i in range(19)]
-        sub_progress = total_progress / len(image_list)
-        for img in image_list:
-            PROGRESS(sub_progress)
+        sub_progress = total_progress / project_num
+
+        for i in range(project_num):
+            img = p.stdout.readline().decode("utf-8")[:-1]
             st_image_file(st, img, width=300)
+            PROGRESS(sub_progress)
 
     with col4:
         st.subheader("Re-Proj Result")
         total_progress = 20
-        image_list = [f'./network/proj_resp_{i}.png' for i in range(19)]
-        sub_progress = total_progress / len(image_list)
-        for img in image_list:
-            PROGRESS(sub_progress)
+        sub_progress = total_progress / project_num
+
+        for i in range(project_num):
+            img = p.stdout.readline().decode("utf-8")[:-1]
             st_image_file(st, img, width=300)
+            PROGRESS(sub_progress)
 
     with st.sidebar:
+        resp_img = p.stdout.readline().decode("utf-8")[:-1]
         PROGRESS(10)
-        st_image_file(st, './network/resp.png')
+        st_image_file(st, resp_img)
         st.success("Process Pano Image Success!")
 
     st.markdown('<iframe src="https://gltf-viewer.donmccurdy.com/" '
