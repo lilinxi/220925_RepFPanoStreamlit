@@ -43,8 +43,9 @@ if uploaded_file is not None:
             os.remove(log_path)
         open(log_path, 'w').close()
 
+        # 1. 先打开日志流监控
         p = subprocess.Popen(f'tail -f {log_path}', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
+        # 2. 再请求算法模块，image_path 使用绝对路径
         threading.Thread(target=detect_client(image_path)).start()
 
         line = p.stdout.readline().decode("utf-8")[:-1]

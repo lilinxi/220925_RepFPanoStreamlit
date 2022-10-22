@@ -2,9 +2,32 @@ import os
 import time
 import platform
 
+
 def detect_client(image_path):
     example_client(image_path)
 
+
+def write_log(log_path: str, line: str):
+    log = open(log_path, "a")
+    log.write(line)
+    log.close()
+
+
+def repf_pano_client(image_path):
+    log_path = f'{image_path}.log'  # image_path 为绝对路径
+
+    time_stamp = int(time.time())
+    work_dir = f'/home/lmf/tmp/repf_pano_client/{time_stamp}'
+
+    os.system(f'mkdir -p {work_dir}')
+    os.system(f'cp {image_path} {work_dir}/input')
+    os.system(f'cp /home/lmf/Deploy/220925_RepFPanoStreamlit/metadata.json {work_dir}/input')
+    os.system(f'CUDA_VISIBLE_DEVICES=0 WANDB_MODE=dryrun python main.py configs/pano3d_igibson.yaml --model.scene_gcn.relation_adjust True --mode test --demo_path /homo/ada/da/da -- save_path /home/da/da')
+
+
+    # call mvpf_detect
+
+    # call
 
 def example_client(image_path):
     image_path_list = image_path.split('\\')
