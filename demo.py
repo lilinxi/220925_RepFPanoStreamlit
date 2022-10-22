@@ -101,6 +101,8 @@ if uploaded_file is not None:
         st_image_file(st, resp_img)
         st.success("Process Pano Image Success!")
 
+    resp_glb = p.stdout.readline().decode("utf-8")[:-1]
+    st.markdown('<a href="http://219.224.167.226/scene.glb" download="scene.glb">scene.glb</a>', unsafe_allow_html=True)
     st.markdown('<iframe src="https://gltf-viewer.donmccurdy.com/" '
                 'style="'
                 'width: 100%; '
