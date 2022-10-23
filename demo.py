@@ -27,7 +27,20 @@ uploaded_file = st.file_uploader("Drag and drop a pano image, only jpg or png ar
 if uploaded_file is not None:
     file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
     opencv_image = cv2.imdecode(file_bytes, 1)
-    image_path = "./test.png"
+
+    time_stamp = int(time.time())
+    sys = platform.system()
+    if sys == 'Darwin':
+        work_dir = f'/Users/limengfan/Desktop/tmp/repf_pano_client/{time_stamp}'
+    elif sys == 'Linux':
+        work_dir = f'/home/lmf/tmp/repf_pano_client/{time_stamp}'
+    else:
+        print(f"uploaded_file do not support {sys} system")
+        exit(255)
+    if not os.path.exists(work_dir):
+        os.makedirs(work_dir)
+    image_path = f"{work_dir}/input.png"
+    print("image_path:", image_path)
     cv2.imwrite(image_path, opencv_image)
 
     with st.sidebar:
@@ -50,11 +63,27 @@ if uploaded_file is not None:
 
         line = p.stdout.readline().decode("utf-8")[:-1]
         PROGRESS = get_progress()
-        PROGRESS(10)
+        PROGRESS(5)
 
         project_num = int(p.stdout.readline().decode("utf-8")[:-1])
 
     col1, col2, col3, col4 = st.columns([1, 1, 2, 2])
+
+    # with col1:
+    #     st.subheader("Proj Image")
+    # with col2:
+    #     st.subheader("Proj Result")
+    # total_progress = 20
+    # sub_progress = total_progress / project_num
+    #
+    # for _ in range(project_num):
+    #     img = p.stdout.readline().decode("utf-8")[:-1]
+    #     st_image_file(col1, img, width=150)
+    #     PROGRESS(sub_progress)
+    #
+    #     img = p.stdout.readline().decode("utf-8")[:-1]
+    #     st_image_file(col2, img, width=150)
+    #     PROGRESS(sub_progress)
 
     with col1:
         st.subheader("Proj Image")
@@ -98,9 +127,8 @@ if uploaded_file is not None:
 
     with st.sidebar:
         resp_img = p.stdout.readline().decode("utf-8")[:-1]
-        PROGRESS(10)
+        PROGRESS(5)
         st_image_file(st, resp_img)
-        st.success("Process Pano Image Success!")
 
     resp_glb = p.stdout.readline().decode("utf-8")[:-1]
     st.markdown('<a href="http://219.224.167.226/scene.glb" download="scene.glb">scene.glb</a>', unsafe_allow_html=True)
@@ -111,3 +139,7 @@ if uploaded_file is not None:
                 '">'
                 '</iframe>',
                 unsafe_allow_html=True)
+    PROGRESS(10)
+    st.success("Process Pano Image Success!")
+
+
