@@ -1,6 +1,7 @@
 import os
 import time
 import platform
+import subprocess
 
 import grpc
 import proto_gen.detect_pb2
@@ -30,16 +31,13 @@ def repf_pano_client(image_path):
         os.makedirs(deep_work_dir)
         os.makedirs(f'{deep_work_dir}/input')
 
-    os.system(f'cp {image_path} {deep_work_dir}/input')
-    os.system(f'cp /home/lmf/Deploy/220925_RepFPanoStreamlit/metadata.json {deep_work_dir}/input')
-    # os.system(f'CUDA_VISIBLE_DEVICES=0 WANDB_MODE=dryrun python main.py configs/pano3d_igibson.yaml --model.scene_gcn.relation_adjust True --mode test --demo_path /homo/ada/da/da -- save_path /home/da/da')
+    sub = subprocess.Popen("./repf_pano_client.sh /home/lmf/tmp/repf_pano_client/1666520115/input.png.deep/input",
+                           shell=True, stdout=subprocess.PIPE)
+    sub.wait()
 
-    print(f'CUDA_VISIBLE_DEVICES=0 WANDB_MODE=dryrun python main.py configs/pano3d_igibson.yaml --model.scene_gcn.relation_adjust True --mode test --demo_path {deep_work_dir}/input -- save_path {deep_work_dir}/output')
-
-
-    # call mvpf_detect
-
-    # call
+    log = open(f'{image_path}.log', "a")
+    log.write("scene.glb")
+    log.close()
 
 def example_client(image_path):
     image_path_list = image_path.split('\\')
