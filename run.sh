@@ -1,2 +1,2 @@
 source activate RepFPanoStreamlit
-streamlit run demo.py
+nohup streamlit run demo.py &
