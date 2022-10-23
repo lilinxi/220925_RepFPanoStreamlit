@@ -1,2 +1,2 @@
-# conda activate RepFPanoStreamlit
+source activate RepFPanoStreamlit
 streamlit run demo.py

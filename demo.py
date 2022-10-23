@@ -140,6 +140,7 @@ if uploaded_file is not None:
                 '</iframe>',
                 unsafe_allow_html=True)
     PROGRESS(10)
-    st.success("Process Pano Image Success!")
+    with st.sidebar:
+        st.success("Process Pano Image Success!")
 
 

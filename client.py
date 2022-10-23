@@ -7,6 +7,13 @@ import grpc
 import proto_gen.detect_pb2
 import proto_gen.detect_pb2_grpc
 
+def write_log(log_path: str, line: str):
+    log = open(log_path, "a")
+    log.write(line)
+    log.write('\n')
+    log.close()
+
+
 
 def detect_client(image_path):
     repf_pano_client(image_path)
@@ -31,13 +38,12 @@ def repf_pano_client(image_path):
         os.makedirs(deep_work_dir)
         os.makedirs(f'{deep_work_dir}/input')
 
-    sub = subprocess.Popen("./repf_pano_client.sh /home/lmf/tmp/repf_pano_client/1666520115/input.png.deep/input",
-                           shell=True, stdout=subprocess.PIPE)
-    sub.wait()
+    # sub = subprocess.Popen("./repf_pano_client.sh /home/lmf/tmp/repf_pano_client/1666520115/input.png.deep/input",
+    #                        shell=True, stdout=subprocess.PIPE)
+    # sub.wait()
 
-    log = open(f'{image_path}.log', "a")
-    log.write("scene.glb")
-    log.close()
+    print(image_path)
+    write_log(f'{image_path}.log', "scene.glb")
 
 def example_client(image_path):
     image_path_list = image_path.split('\\')
